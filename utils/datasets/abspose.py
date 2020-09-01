@@ -24,7 +24,7 @@ class AbsPoseDataset(data.Dataset):
         data_dict = {}
         im = self.ims[index]
         data_dict['im_ref'] = im 
-        im = Image.open(os.path.join(self.data_dir, im))
+        im = Image.open(os.path.join(self.data_dir, im)).convert("RGB")
         if self.transforms:
             im = self.transforms(im)
         data_dict['im'] = im        
