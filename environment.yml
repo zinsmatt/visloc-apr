@@ -6,7 +6,7 @@ channels:
   - defaults
 dependencies:
   - cudatoolkit
-  - python=3.7
+  - python
   - pytorch
   - torchvision
   - visdom

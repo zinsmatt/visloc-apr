@@ -5,8 +5,8 @@ import torch
 from torchvision import transforms
 import torch.utils.data as data
 
-from utils.common.config_parser import AbsPoseConfig 
-from utils.common.setup import * 
+from utils.common.config_parser import AbsPoseConfig
+from utils.common.setup import *
 from utils.datasets.preprocess import *
 from utils.datasets.abspose import AbsPoseDataset
 from utils.common.visdom_templates import PoseNetVisTmp, OptimSearchVisTmp
@@ -32,16 +32,16 @@ def setup_config(config):
     else:
         print('No GPU available, use CPU device.')
         config.device = torch.device("cpu")
-    delattr(config, 'gpu') 
+    delattr(config, 'gpu')
 
     if config.validate:
         config.validate = config.validate[0]
- 
+
     # Setup datasets
     config.data_class = AbsPoseDataset
-        
+
     # Define image preprocessing
-    im_mean = os.path.join(config.data_root, config.dataset, config.image_mean) if config.image_mean else None 
+    im_mean = os.path.join(config.data_root, config.dataset, config.image_mean) if config.image_mean else None
     if config.crop:
         crop = 'random' if config.training else 'center'
     else:
@@ -51,8 +51,8 @@ def setup_config(config):
     delattr(config, 'crop')
     delattr(config, 'rescale')
     delattr(config, 'normalize')
-    
-    # Model initialization 
+
+    # Model initialization
     config.start_epoch = 0
     config.weights_dir = None
     config.weights_dict = None
@@ -61,7 +61,7 @@ def setup_config(config):
         config.weights_dir = config.pretrained[0]
         config.weights_dict = torch.load(config.weights_dir)
     if config.resume:
-        config.weights_dir = config.resume[0]    
+        config.weights_dir = config.resume[0]
         checkpoint = torch.load(config.weights_dir)
         assert config.network == checkpoint['network']
         config.start_epoch = checkpoint['last_epoch'] + 1
@@ -69,8 +69,8 @@ def setup_config(config):
         config.optimizer_dict = checkpoint['optimizer']
     delattr(config, 'resume')
     delattr(config, 'pretrained')
-    
-    # Setup optimizer 
+
+    # Setup optimizer
     optim = config.optim
     optim_tag = ''
     if config.optim == 'Adam':
@@ -79,12 +79,12 @@ def setup_config(config):
     elif config.optim == 'SGD':
         optim_tag = 'SGD_mom{}'.format(config.momentum)
         delattr(config, 'epsilon')
-    optim_tag = '{}_{}'.format(optim_tag, config.lr_init)        
+    optim_tag = '{}_{}'.format(optim_tag, config.lr_init)
     if config.lr_decay:
         config.lr_decay_step = int(config.lr_decay[1])
         config.lr_decay_factor = float(config.lr_decay[0])
         config.lr_decay = True
-        optim_tag = '{}_lrd{}-{}'.format(optim_tag, config.lr_decay_step, config.lr_decay_factor)   
+        optim_tag = '{}_lrd{}-{}'.format(optim_tag, config.lr_decay_step, config.lr_decay_factor)
     optim_tag = '{}_wd{}'.format(optim_tag, config.weight_decay)
     config.optim_tag = optim_tag
 
@@ -101,7 +101,7 @@ def train(net, config, log, train_loader, val_loader=None):
     for epoch in range(config.start_epoch, config.epochs):
          net.train() # Switch to training mode
          loss, losses = net.train_epoch(train_loader, epoch)
-         lprint('Epoch {}, loss:{}'.format(epoch+1, loss), log)         
+         lprint('Epoch {}, loss:{}'.format(epoch+1, loss), log)
          # Update homo variable meters
          if config.learn_weighting and homo_meters is not None:
              homo_meters[0].update(X=epoch+1, Y=net.sx)
@@ -125,8 +125,8 @@ def train(net, config, log, train_loader, val_loader=None):
                    }
             ckpt_name = 'checkpoint_{epoch}_{abs_err[0]:.2f}m_{abs_err[1]:.2f}deg.pth'.format(epoch=(epoch+1), abs_err=abs_err)
             torch.save(ckpt, os.path.join(config.ckpt_dir, ckpt_name))
-            lprint('Save checkpoint: {}'.format(ckpt_name), log)            
-            
+            lprint('Save checkpoint: {}'.format(ckpt_name), log)
+
             # Update validation acc
             pos_acc_meter.update(X=epoch+1, Y=abs_err[0])
             rot_acc_meter.update(X=epoch+1, Y=abs_err[1])
@@ -134,10 +134,12 @@ def train(net, config, log, train_loader, val_loader=None):
     lprint('Total training time {0:.4f}s'.format((time.time() - start_time)), log)
 
 def test(net, config, log, data_loader, err_thres=(2, 5)):
-    print('Evaluate on dataset:{}'.format(data_loader.dataset.dataset))    
+    print('Evaluate on dataset:{}'.format(data_loader.dataset.dataset))
     net.eval()
     pos_err = []
     ori_err = []
+    poses=[]
+    gt_poses=[]
     with torch.no_grad():
         for i,batch in enumerate(data_loader):
             xyz, wpqr = net.predict_(batch)
@@ -147,6 +149,10 @@ def test(net, config, log, data_loader, err_thres=(2, 5)):
             q_err = cal_quat_angle_error(wpqr, wpqr_)
             pos_err += list(t_err)
             ori_err += list(q_err)
+
+            poses.append(np.hstack((xyz, wpqr)))
+            # print(poses)
+    np.savetxt("estimated_poses_test_far.txt", np.vstack(poses))
     err = (np.median(pos_err), np.median(ori_err))
     passed = 0
     for i, perr in enumerate(pos_err):
@@ -183,9 +189,9 @@ def main():
     lprint('Model params: {} Optimizer params: {}'.format(len(net.state_dict()), len(net.optimizer.param_groups[0]['params'])))
 
     if config.training:
-        train(net, config, log, data_loader, val_loader) 
+        train(net, config, log, data_loader, val_loader)
     else:
-        test(net, config, log, data_loader) 
+        test(net, config, log, data_loader)
     log.close()
 
 if __name__ == '__main__':
