@@ -13,12 +13,13 @@
 
 #--resume 'output/posenet/test/ckpt/checkpoint_1000_853.44m_39.91deg.pth' \
 
-python -m abspose -b 50 --train -val 500 --epoch 10000 \
-       --data_root '/home/mzins/dev/Learning_Uncertainties/ellipse_from_object/VW/for_posenet' \
-       --pose_txt 'VW_dataset.txt' --val_pose_txt 'VW_dataset.txt' \
-       --dataset 'VW_dataset' \
-       --network 'PoseNet'  \
+python -m abspose -b 48 --train -val 10 --epoch 100 \
+       --data_root 'dataset' \
+       --pose_txt 'posenet_7-Scenes_dataset_seq_01_03_04_05_06.txt' --val_pose_txt 'posenet_7-Scenes_dataset_seq_02.txt' \
+       --dataset '7-Scenes_dataset' \
+       --network 'PoseNet'  --pretrained 'weights/googlenet_places.extract.pth' \
        --optim 'Adam' -eps 1.0 -lr 0.001 -wd 0.0001 \
        --beta 100 \
-       --odir '/media/mzins/DATA1/PoseNet/test' 
+       --odir 'training_output'
+
 

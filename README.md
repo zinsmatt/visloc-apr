@@ -1,3 +1,21 @@
+# Custom version
+
+The dataset shoudl be organised like this:
+
+```
+dataset_folder/
+    dataset_name/
+        dataset_name.txt
+```
+and this *.txt* file should contain:
+
+```
+filename x y z qw qx qy qz
+```
+
+which is the camera pose (position and orientation as quaternions) for each image=.
+
+
 ## Absolute Camera Pose Regression for Visual Localization
 This repository provides implementation of PoseNet\[Kendall2015ICCV\], PoseNet-Nobeta\[Kendall2017CVPR\] which trains PoseNet using the loss learning the weighting parameter and PoseLSTM\[Walch2017ICCV\].
 To use our code, first download the repository:

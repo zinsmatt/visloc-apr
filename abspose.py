@@ -140,6 +140,7 @@ def test(net, config, log, data_loader, err_thres=(2, 5)):
     ori_err = []
     poses=[]
     gt_poses=[]
+    DEBUG = []
     with torch.no_grad():
         for i,batch in enumerate(data_loader):
             xyz, wpqr = net.predict_(batch)
@@ -151,6 +152,9 @@ def test(net, config, log, data_loader, err_thres=(2, 5)):
             ori_err += list(q_err)
 
             poses.append(np.hstack((xyz, wpqr)))
+            for j in range(xyz.shape[0]):
+                DEBUG.append("%f %f %f %f %f %f %f\n" % (xyz[j, 0], xyz[j, 1], xyz[j, 2], wpqr[j, 0], wpqr[j, 1], wpqr[j, 2], wpqr[j, 3]))
+
             # print(poses)
     np.savetxt("estimated_poses_test_far.txt", np.vstack(poses))
     err = (np.median(pos_err), np.median(ori_err))
@@ -163,6 +167,8 @@ def test(net, config, log, data_loader, err_thres=(2, 5)):
     print("Mean orientation errorr : ", np.mean(ori_err))
     print("Median position errorr : ", err[0])
     print("Median orientation errorr : ", err[1])
+    with open("DEBUG.txt", "w") as fout:
+        fout.writelines(DEBUG)
     return err
 
 def main():
