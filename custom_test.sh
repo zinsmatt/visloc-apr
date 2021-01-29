@@ -1,4 +1,4 @@
-python -m abspose -b 75 --test \
+python -m abspose -b 48 --test \
        --data_root 'dataset' \
        --pose_txt 'posenet_7-Scenes_dataset_seq_02.txt' --val_pose_txt 'posenet_7-Scenes_dataset_seq_02.txt' \
        --dataset '7-Scenes_dataset' \
