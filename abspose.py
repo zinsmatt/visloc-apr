@@ -153,6 +153,10 @@ def test(net, config, log, data_loader, err_thres=(2, 5)):
         if perr < err_thres[0] and ori_err[i] < err_thres[1]:
             passed += 1
     lprint('Accuracy: ({err[0]:.2f}m, {err[1]:.2f}deg) Pass({err_thres[0]}m, {err_thres[1]}deg): {rate:.2f}% '.format(err=err, err_thres=err_thres, rate=100.0 * passed / i), log)    
+    print("Mean position errorr : ", np.mean(pos_err))
+    print("Mean orientation errorr : ", np.mean(ori_err))
+    print("Median position errorr : ", err[0])
+    print("Median orientation errorr : ", err[1])
     return err
 
 def main():
