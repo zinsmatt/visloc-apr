@@ -14,12 +14,14 @@ import os
 output_file = "posenet_7-Scenes_dataset_seq_01_03_04_05_06.txt"
 output_file = "posenet_7-Scenes_dataset_seq_02.txt"
 output_file = "posenet_7-Scenes_dataset_seq_03.txt"
+output_file = "posenet_7-Scenes_dataset_seq_01_04_06.txt"
 # output_file = "posenet_7-Scenes_dataset_seq_05.txt"
 
 sequences = ["seq-01", "seq-03", "seq-04", "seq-05", "seq-06"]
+sequences = ["seq-01", "seq-04", "seq-06"]
 sequences = ["seq-02"]
 sequences = ["seq-03"]
-# sequences = ["seq-05"]
+sequences = ["seq-05"]
 
 output_lines = []
 
