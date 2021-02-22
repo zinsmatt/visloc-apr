@@ -3,7 +3,7 @@
 source activate visloc_apr
 
 # Train PoseNet with Beta loss
-python -m abspose -b 75 --train -val 10 --epoch 1000 \
+python -m abspose -b 75 --train -val 50 --epoch 300 \
        --data_root 'data/CambridgeLandmarks' \
        --pose_txt 'dataset_train.txt' --val_pose_txt 'dataset_test.txt' \
        --dataset 'ShopFacade' -rs 256 --crop 224 \
